@@ -1,0 +1,24 @@
+---
+# This is a role for setting up the attacker machine.
+
+- name: Install packages
+  apt:
+    pkg:
+      - nmap
+      - ftp
+      - iptables
+    update_cache: yes
+
+- name: Create alias for server
+  lineinfile:
+    path: '/etc/hosts'
+    line: '192.168.20.5 server'
+
+- name: Redirect training IP to actual server IP
+  iptables:
+    table: nat
+    chain: OUTPUT
+    destination: 10.1.26.9
+    jump: DNAT
+    to_destination: 192.168.20.5
+...
