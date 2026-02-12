@@ -1,0 +1,20 @@
+---
+# Client role: machine on the target network
+
+- name: Create alias for server
+  lineinfile:
+    path: /etc/hosts
+    line: '10.1.26.9 server'
+
+- name: Create alias for attacker
+  lineinfile:
+    path: /etc/hosts
+    line: '10.1.27.23 attacker'
+
+- name: Install basic packages
+  apt:
+    pkg:
+      - curl
+      - net-tools
+    update_cache: yes
+...
