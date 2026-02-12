@@ -22,11 +22,21 @@
       - openssh-server
     update_cache: yes
 
-- name: Enable anonymous FTP login
-  lineinfile:
-    path: /etc/vsftpd.conf
-    regexp: '^#?anonymous_enable='
-    line: 'anonymous_enable=YES'
+- name: Deploy vsftpd configuration
+  copy:
+    src: vsftpd.conf
+    dest: /etc/vsftpd.conf
+    owner: root
+    mode: '0644'
+  notify: restart vsftpd
+
+- name: Ensure FTP anonymous directory exists
+  file:
+    path: /srv/ftp
+    state: directory
+    owner: ftp
+    group: ftp
+    mode: '0755'
 
 - name: Deploy backup.txt to FTP anonymous directory
   copy:
@@ -36,10 +46,10 @@
     group: ftp
     mode: '0644'
 
-- name: Restart and enable vsftpd
+- name: Enable vsftpd
   service:
     name: vsftpd
-    state: restarted
+    state: started
     enabled: yes
 
 - name: Ensure SSH is running
