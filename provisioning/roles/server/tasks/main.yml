@@ -52,6 +52,13 @@
     state: started
     enabled: yes
 
+- name: Enable SSH password authentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PasswordAuthentication'
+    line: 'PasswordAuthentication yes'
+  notify: restart ssh
+
 - name: Ensure SSH is running
   service:
     name: ssh
