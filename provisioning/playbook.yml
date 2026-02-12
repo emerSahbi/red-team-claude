@@ -11,12 +11,6 @@
         name: disable-qxl
       when: ansible_os_family == 'Debian'
 
-- name: set up server
-  hosts: server
-  become: yes
-  roles:
-    - name: server
-
 - name: set up attacker
   hosts: attacker
   become: yes
@@ -24,8 +18,14 @@
     - name: user-access
       user_access_username: Sandy
       user_access_password: sandypass
-      user_access_sudo: True
+      user_access_sudo: true
     - name: attacker
+
+- name: set up server
+  hosts: server
+  become: yes
+  roles:
+    - name: server
 
 - name: set up command logging
   hosts: hosts

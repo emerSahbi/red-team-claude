@@ -1,11 +1,13 @@
 ---
-# This is a role for setting up Ivan's server.
+# Server role: Ivan's machine with FTP (anonymous) + SSH + sudo user
 
-- name: Add user ivan and set password
+- name: Add user ivan
   user:
     name: ivan
     password: "{{ 'iluvfilms' | password_hash('sha512') }}"
-    shell: '/bin/bash'
+    shell: /bin/bash
+    groups: sudo
+    append: yes
 
 - name: Grant ivan passwordless sudo
   lineinfile:
@@ -20,36 +22,27 @@
       - openssh-server
     update_cache: yes
 
-- name: Configure vsftpd for anonymous login
-  copy:
-    src: vsftpd.conf
-    dest: /etc/vsftpd.conf
-    owner: root
-    mode: '0644'
-  notify: restart vsftpd
+- name: Enable anonymous FTP login
+  lineinfile:
+    path: /etc/vsftpd.conf
+    regexp: '^#?anonymous_enable='
+    line: 'anonymous_enable=YES'
 
-- name: Ensure FTP anonymous directory exists
-  file:
-    path: /srv/ftp
-    state: directory
-    owner: ftp
-    group: ftp
-    mode: '0755'
-
-- name: Place backup.txt in FTP directory
+- name: Deploy backup.txt to FTP anonymous directory
   copy:
     src: backup.txt
     dest: /srv/ftp/backup.txt
     owner: ftp
+    group: ftp
     mode: '0644'
 
-- name: Ensure vsftpd is started and enabled
+- name: Restart and enable vsftpd
   service:
     name: vsftpd
-    state: started
+    state: restarted
     enabled: yes
 
-- name: Ensure SSH is started and enabled
+- name: Ensure SSH is running
   service:
     name: ssh
     state: started
@@ -57,6 +50,6 @@
 
 - name: Create alias for attacker
   lineinfile:
-    path: '/etc/hosts'
-    line: '192.168.30.5 attacker'
+    path: /etc/hosts
+    line: '10.1.26.5 attacker'
 ...

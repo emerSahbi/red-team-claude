@@ -1,3 +1,1 @@
-# Server login credentials backup
-username: ivan
-password: iluvfilms
+ivan:iluvfilms
