@@ -1,0 +1,55 @@
+---
+# Server role: Ivan's machine with FTP (anonymous) + SSH + sudo user
+
+- name: Add user ivan
+  user:
+    name: ivan
+    password: "{{ 'iluvfilms' | password_hash('sha512') }}"
+    shell: /bin/bash
+    groups: sudo
+    append: yes
+
+- name: Grant ivan passwordless sudo
+  lineinfile:
+    path: /etc/sudoers
+    line: 'ivan ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+
+- name: Install packages
+  apt:
+    pkg:
+      - vsftpd
+      - openssh-server
+    update_cache: yes
+
+- name: Enable anonymous FTP login
+  lineinfile:
+    path: /etc/vsftpd.conf
+    regexp: '^#?anonymous_enable='
+    line: 'anonymous_enable=YES'
+
+- name: Deploy backup.txt to FTP anonymous directory
+  copy:
+    src: backup.txt
+    dest: /srv/ftp/backup.txt
+    owner: ftp
+    group: ftp
+    mode: '0644'
+
+- name: Restart and enable vsftpd
+  service:
+    name: vsftpd
+    state: restarted
+    enabled: yes
+
+- name: Ensure SSH is running
+  service:
+    name: ssh
+    state: started
+    enabled: yes
+
+- name: Create alias for attacker
+  lineinfile:
+    path: /etc/hosts
+    line: '10.1.26.5 attacker'
+...

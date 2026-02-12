@@ -1,0 +1,42 @@
+name: red-team-training
+
+hosts:
+  - name: attacker
+    base_box:
+      image: kali
+      man_user: kali
+    flavor: m1.small
+
+  - name: server
+    base_box:
+      image: ubuntu-noble-x86_64
+      man_user: ubuntu
+    flavor: m1.small
+
+routers:
+  - name: router
+    base_box:
+      image: debian-12-x86_64
+      man_user: debian
+    flavor: m1.small
+
+networks:
+  - name: lab-net
+    cidr: 10.1.26.0/24
+    accessible_by_user: true
+
+net_mappings:
+  - host: attacker
+    network: lab-net
+    ip: 10.1.26.5
+
+  - host: server
+    network: lab-net
+    ip: 10.1.26.9
+
+router_mappings:
+  - router: router
+    network: lab-net
+    ip: 10.1.26.1
+
+groups: []
