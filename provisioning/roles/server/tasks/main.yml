@@ -54,8 +54,6 @@
 
 - name: Remove ALL sshd drop-in configs that may disable password auth
   shell: rm -f /etc/ssh/sshd_config.d/*.conf
-  args:
-    warn: false
 
 - name: Deploy password auth drop-in config
   copy:
