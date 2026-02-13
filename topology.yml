@@ -1,4 +1,4 @@
-name: red-team-training-EMER-TEST
+name: red-team-training-EMER
 
 hosts:
   - name: attacker
