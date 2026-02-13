@@ -4,7 +4,7 @@ hosts:
   - name: attacker
     base_box:
       image: kali
-      mgmt_user: kali
+      mgmt_user: debian
     flavor: m1.small
 
   - name: server
