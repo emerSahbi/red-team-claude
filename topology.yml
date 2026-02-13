@@ -1,4 +1,4 @@
-name: red-team-training
+name: red-team-training-SAMA
 
 hosts:
   - name: attacker
