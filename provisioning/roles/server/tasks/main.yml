@@ -52,24 +52,36 @@
     state: started
     enabled: yes
 
-- name: Remove cloud-init SSH config that disables password auth
-  file:
-    path: /etc/ssh/sshd_config.d/50-cloud-init.conf
-    state: absent
-  notify: restart ssh
+- name: Remove ALL sshd drop-in configs that may disable password auth
+  shell: rm -f /etc/ssh/sshd_config.d/*.conf
+  args:
+    warn: false
 
-- name: Enable SSH password authentication
+- name: Deploy password auth drop-in config
   copy:
-    dest: /etc/ssh/sshd_config.d/60-password-auth.conf
-    content: 'PasswordAuthentication yes'
+    dest: /etc/ssh/sshd_config.d/00-password-auth.conf
+    content: |
+      PasswordAuthentication yes
+      KbdInteractiveAuthentication yes
     owner: root
     mode: '0644'
-  notify: restart ssh
 
-- name: Ensure SSH is running
+- name: Ensure PasswordAuthentication yes in main sshd_config
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?\s*PasswordAuthentication\s+'
+    line: 'PasswordAuthentication yes'
+
+- name: Ensure KbdInteractiveAuthentication yes in main sshd_config
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?\s*KbdInteractiveAuthentication\s+'
+    line: 'KbdInteractiveAuthentication yes'
+
+- name: Force restart SSH
   service:
     name: ssh
-    state: started
+    state: restarted
     enabled: yes
 
 - name: Create alias for attacker
