@@ -52,11 +52,18 @@
     state: started
     enabled: yes
 
+- name: Remove cloud-init SSH config that disables password auth
+  file:
+    path: /etc/ssh/sshd_config.d/50-cloud-init.conf
+    state: absent
+  notify: restart ssh
+
 - name: Enable SSH password authentication
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: '^#?PasswordAuthentication'
-    line: 'PasswordAuthentication yes'
+  copy:
+    dest: /etc/ssh/sshd_config.d/60-password-auth.conf
+    content: 'PasswordAuthentication yes'
+    owner: root
+    mode: '0644'
   notify: restart ssh
 
 - name: Ensure SSH is running
