@@ -1,15 +1,10 @@
 ---
-# Attacker role: Debian machine with recon and attack tools
+# Attacker role: Kali machine with recon tools
 
 - name: Create alias for server
   lineinfile:
     path: /etc/hosts
     line: '10.1.26.9 server'
-
-- name: Create alias for client
-  lineinfile:
-    path: /etc/hosts
-    line: '10.1.26.4 client'
 
 - name: Install recon and attack tools
   apt:

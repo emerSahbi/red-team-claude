@@ -68,10 +68,5 @@
 - name: Create alias for attacker
   lineinfile:
     path: /etc/hosts
-    line: '10.1.27.23 attacker'
-
-- name: Create alias for client
-  lineinfile:
-    path: /etc/hosts
-    line: '10.1.26.4 client'
+    line: '10.1.26.5 attacker'
 ...

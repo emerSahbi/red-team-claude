@@ -27,12 +27,6 @@
   roles:
     - name: server
 
-- name: set up client
-  hosts: client
-  become: yes
-  roles:
-    - name: client
-
 - name: set up command logging
   hosts: hosts
   become: yes
