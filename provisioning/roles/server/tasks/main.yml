@@ -52,26 +52,14 @@
     state: started
     enabled: yes
 
-- name: Remove ALL sshd drop-in configs that may disable password auth
+- name: Remove ALL sshd drop-in configs
   shell: rm -f /etc/ssh/sshd_config.d/*.conf
 
-- name: Disable cloud-init SSH module so it cannot recreate drop-in overrides
-  copy:
-    dest: /etc/cloud/cloud.cfg.d/99-disable-ssh.cfg
-    content: |
-      ssh_pwauth: true
-      disable_root: false
-    owner: root
-    mode: '0644'
-
-- name: Deploy password auth drop-in config (99 prefix to override everything)
-  copy:
-    dest: /etc/ssh/sshd_config.d/99-password-auth.conf
-    content: |
-      PasswordAuthentication yes
-      KbdInteractiveAuthentication yes
-    owner: root
-    mode: '0644'
+- name: Comment out Include directive so no drop-in can override main config
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^\s*Include\s+'
+    line: '# Include /etc/ssh/sshd_config.d/*.conf'
 
 - name: Ensure PasswordAuthentication yes in main sshd_config
   lineinfile:
@@ -85,12 +73,18 @@
     regexp: '^#?\s*KbdInteractiveAuthentication\s+'
     line: 'KbdInteractiveAuthentication yes'
 
-- name: Ensure Include directive loads drop-ins
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: '^#?\s*Include\s+'
-    line: 'Include /etc/ssh/sshd_config.d/*.conf'
-    insertbefore: BOF
+- name: Fully disable cloud-init SSH management
+  copy:
+    dest: /etc/cloud/cloud.cfg.d/99-disable-ssh.cfg
+    content: |
+      ssh_pwauth: true
+      ssh:
+        emit_keys_to_console: false
+    owner: root
+    mode: '0644'
+
+- name: Prevent cloud-init from running ssh module again
+  shell: rm -f /etc/ssh/sshd_config.d/*.conf
 
 - name: Force restart SSH
   service:
